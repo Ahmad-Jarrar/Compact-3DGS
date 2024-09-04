@@ -4,8 +4,6 @@
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
-
-**/**/__pycache__/
 *.py[cod]
 *$py.class
 
@@ -176,3 +174,11 @@ poetry.toml
 pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
+
+
+# Custom stuff
+
+**/**/__pycache__/
+
+output/
+
