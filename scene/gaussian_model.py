@@ -95,8 +95,8 @@ class GaussianModel:
                     "otype": "FullyFusedMLP",
                     "activation": "ReLU",
                     "output_activation": "None",
-                    "n_neurons": 64,
-                    "n_hidden_layers": 2,
+                    "n_neurons": model.mlp_neurons,
+                    "n_hidden_layers": model.mlp_layers,
                 },
             )
 
