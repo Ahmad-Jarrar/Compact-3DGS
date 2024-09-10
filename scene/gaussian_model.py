@@ -297,7 +297,7 @@ class GaussianModel:
         save_dict["scale"] = np.frombuffer(self.huf_sca, dtype=np.uint8)
         save_dict["rotation"] = np.frombuffer(self.huf_rot, dtype=np.uint8)
         save_dict["hash"] = np.frombuffer(self.huf_hash, dtype=np.uint8)
-        save_dict["mlp"] = self.mlp_head.params.cpu().half().numpy()
+        # save_dict["mlp"] = self.mlp_head.params.cpu().half().numpy()
         save_dict["mlp"] = [self.mlp_heads[i].params.cpu().half().numpy() for i in range(self.n_mlp_heads)]
         save_dict["huftable_opacity"] = self.tab_opa
         save_dict["huftable_scale"] = self.tab_sca
