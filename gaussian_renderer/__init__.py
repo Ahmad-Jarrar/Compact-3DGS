@@ -87,7 +87,7 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
         # shs = pc.mlp_head(torch.cat([pc.recolor(xyz), pc.direction_encoding(dir_pp)], dim=-1)).unsqueeze(1)
 
         # Ensemble of SHs
-        shs_list = [pc.mlp_heads[i](torch.cat([pc._feature, pc.direction_encoding(dir_pp)], dim=-1)).unsqueeze(1) for i in range(pc.n_mlp_heads)]
+        shs_list = [pc.mlp_heads[i](torch.cat([pc.recolor(xyz), pc.direction_encoding(dir_pp)], dim=-1)).unsqueeze(1) for i in range(pc.n_mlp_heads)]
         shs = torch.mean(torch.stack(shs_list), dim=0)
 
     # Rasterize visible Gaussians to image, obtain their radii (on screen). 
