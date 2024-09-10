@@ -61,7 +61,11 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
         
         dir_pp = (means3D - viewpoint_camera.camera_center.repeat(means3D.shape[0], 1))
         dir_pp = dir_pp/dir_pp.norm(dim=1, keepdim=True)
-        shs = pc.mlp_head(torch.cat([pc._feature, pc.direction_encoding(dir_pp)], dim=-1)).unsqueeze(1)
+        # shs = pc.mlp_head(torch.cat([pc._feature, pc.direction_encoding(dir_pp)], dim=-1)).unsqueeze(1)
+
+        # Ensemble of SHs
+        shs_list = [pc.mlp_heads[i](torch.cat([pc._feature, pc.direction_encoding(dir_pp)], dim=-1)).unsqueeze(1) for i in range(pc.n_mlp_heads)]
+        shs = torch.mean(torch.stack(shs_list), dim=0)
         
     else:
         mask = ((torch.sigmoid(pc._mask) > 0.01).float()- torch.sigmoid(pc._mask)).detach() + torch.sigmoid(pc._mask)
@@ -80,7 +84,11 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
         xyz = pc.contract_to_unisphere(means3D.clone().detach(), torch.tensor([-1.0, -1.0, -1.0, 1.0, 1.0, 1.0], device='cuda'))
         dir_pp = (means3D - viewpoint_camera.camera_center.repeat(means3D.shape[0], 1))
         dir_pp = dir_pp/dir_pp.norm(dim=1, keepdim=True)
-        shs = pc.mlp_head(torch.cat([pc.recolor(xyz), pc.direction_encoding(dir_pp)], dim=-1)).unsqueeze(1)
+        # shs = pc.mlp_head(torch.cat([pc.recolor(xyz), pc.direction_encoding(dir_pp)], dim=-1)).unsqueeze(1)
+
+        # Ensemble of SHs
+        shs_list = [pc.mlp_heads[i](torch.cat([pc._feature, pc.direction_encoding(dir_pp)], dim=-1)).unsqueeze(1) for i in range(pc.n_mlp_heads)]
+        shs = torch.mean(torch.stack(shs_list), dim=0)
 
     # Rasterize visible Gaussians to image, obtain their radii (on screen). 
     rendered_image, radii = rasterizer(

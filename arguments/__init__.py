@@ -59,6 +59,7 @@ class ModelParams(ParamGroup):
         self.rvq_num = 6
         self.mlp_neurons = 64
         self.mlp_layers = 2
+        self.n_mlp_heads = 1
         super().__init__(parser, "Loading Parameters", sentinel)
 
     def extract(self, args):

@@ -70,6 +70,7 @@ class GaussianModel:
         self.vq_rot = ResidualVQ(dim = 4, codebook_size = model.rvq_size, num_quantizers = model.rvq_num, commitment_weight = 0., kmeans_init = True, kmeans_iters = 1, ema_update = False, learnable_codebook=True, in_place_codebook_optimizer=lambda *args, **kwargs: torch.optim.Adam(*args, **kwargs, lr=0.0001)).cuda()
         self.rvq_bit = math.log2(model.rvq_size)
         self.rvq_num = model.rvq_num
+        self.n_mlp_heads = model.n_mlp_heads
         self.recolor = tcnn.Encoding(
                  n_input_dims=3,
                  encoding_config={
@@ -82,13 +83,26 @@ class GaussianModel:
                 },
         )
         self.direction_encoding = tcnn.Encoding(
-            n_input_dims=3,
-            encoding_config={
-                "otype": "SphericalHarmonics",
-                "degree": 3 
-            },
-            )
-        self.mlp_head = tcnn.Network(
+                n_input_dims=3,
+                encoding_config={
+                    "otype": "SphericalHarmonics",
+                    "degree": 3 
+                },
+        )
+        # self.mlp_head = tcnn.Network(
+        #         n_input_dims=(self.direction_encoding.n_output_dims+self.recolor.n_output_dims),
+        #         n_output_dims=3,
+        #         network_config={
+        #             "otype": "FullyFusedMLP",
+        #             "activation": "ReLU",
+        #             "output_activation": "None",
+        #             "n_neurons": model.mlp_neurons,
+        #             "n_hidden_layers": model.mlp_layers,
+        #         },
+        # )
+
+        self.mlp_heads = [
+            tcnn.Network(
                 n_input_dims=(self.direction_encoding.n_output_dims+self.recolor.n_output_dims),
                 n_output_dims=3,
                 network_config={
@@ -98,7 +112,9 @@ class GaussianModel:
                     "n_neurons": model.mlp_neurons,
                     "n_hidden_layers": model.mlp_layers,
                 },
-            )
+            ) for _ in range(self.n_mlp_heads)
+        ]
+        
 
     def capture(self):
         return (
@@ -185,9 +201,13 @@ class GaussianModel:
         other_params = []
         for params in self.recolor.parameters():
             other_params.append(params)
-        for params in self.mlp_head.parameters():
-            other_params.append(params)
-            
+        # for params in self.mlp_head.parameters():
+        #     other_params.append(params)
+        
+        for i in range(self.n_mlp_heads):
+            for params in self.mlp_heads[i].parameters():
+                other_params.append(params)
+
         l = [
             {'params': [self._xyz], 'lr': training_args.position_lr_init * self.spatial_lr_scale, "name": "xyz"},
             {'params': [self._opacity], 'lr': training_args.opacity_lr, "name": "opacity"},
@@ -259,7 +279,8 @@ class GaussianModel:
         save_dict["scale"] = np.packbits(np.unpackbits(self.sca_idx.unsqueeze(-1).cpu().numpy().astype(np.uint8), axis=-1, count=int(self.rvq_bit), bitorder='little').flatten(), axis=None)
         save_dict["rotation"] = np.packbits(np.unpackbits(self.rot_idx.unsqueeze(-1).cpu().numpy().astype(np.uint8), axis=-1, count=int(self.rvq_bit), bitorder='little').flatten(), axis=None)
         save_dict["hash"] = self.recolor.params.cpu().half().numpy()
-        save_dict["mlp"] = self.mlp_head.params.cpu().half().numpy()
+        # save_dict["mlp"] = self.mlp_head.params.cpu().half().numpy()
+        save_dict["mlp"] = [self.mlp_heads[i].params.cpu().half().numpy() for i in range(self.n_mlp_heads)]
         save_dict["codebook_scale"] = self.vq_scale.cpu().state_dict()
         save_dict["codebook_rotation"] = self.vq_rot.cpu().state_dict()
         save_dict["rvq_info"] = np.array([int(self.rvq_num), int(self.rvq_bit)])
@@ -277,6 +298,7 @@ class GaussianModel:
         save_dict["rotation"] = np.frombuffer(self.huf_rot, dtype=np.uint8)
         save_dict["hash"] = np.frombuffer(self.huf_hash, dtype=np.uint8)
         save_dict["mlp"] = self.mlp_head.params.cpu().half().numpy()
+        save_dict["mlp"] = [self.mlp_heads[i].params.cpu().half().numpy() for i in range(self.n_mlp_heads)]
         save_dict["huftable_opacity"] = self.tab_opa
         save_dict["huftable_scale"] = self.tab_sca
         save_dict["huftable_rotation"] = self.tab_rot
@@ -327,7 +349,9 @@ class GaussianModel:
             self._scaling = nn.Parameter(scale.squeeze(1).requires_grad_(True))
             self._rotation = nn.Parameter(rotation.squeeze(1).requires_grad_(True))
             self.recolor.params = nn.Parameter(hashgrid.cuda().half().requires_grad_(True))
-            self.mlp_head.params = nn.Parameter(torch.from_numpy(load_dict["mlp"]).cuda().half().requires_grad_(True))
+            # self.mlp_head.params = nn.Parameter(torch.from_numpy(load_dict["mlp"]).cuda().half().requires_grad_(True))
+            for i in range(self.n_mlp_heads):
+                self.mlp_heads[i].params = nn.Parameter(torch.from_numpy(load_dict["mlp"][i]).cuda().half().requires_grad_(True))
         elif os.path.isfile(path + '.npz'):
             path = path + '.npz'
             print("Loading ", path)
@@ -348,7 +372,10 @@ class GaussianModel:
             self._scaling = nn.Parameter(scale.squeeze(1).requires_grad_(True))
             self._rotation = nn.Parameter(rotation.squeeze(1).requires_grad_(True))
             self.recolor.params = nn.Parameter(torch.from_numpy(load_dict["hash"]).cuda().half().requires_grad_(True))
-            self.mlp_head.params = nn.Parameter(torch.from_numpy(load_dict["mlp"]).cuda().half().requires_grad_(True))
+            # self.mlp_head.params = nn.Parameter(torch.from_numpy(load_dict["mlp"]).cuda().half().requires_grad_(True))
+            for i in range(self.n_mlp_heads):
+                self.mlp_heads[i].params = nn.Parameter(torch.from_numpy(load_dict["mlp"][i]).cuda().half().requires_grad_(True))
+
         else:
             self.load_ply(path)
             
@@ -380,6 +407,7 @@ class GaussianModel:
 
         self.active_sh_degree = self.max_sh_degree
 
+        # Might give error
         torch.nn.ModuleList([self.recolor, self.mlp_head]).load_state_dict(torch.load(path +".pth"))
 
     def replace_tensor_to_optimizer(self, tensor, name):
@@ -577,7 +605,7 @@ class GaussianModel:
         rotation_mb = self._xyz.shape[0]*self.rvq_bit*self.rvq_num/8/10**6 + 2**self.rvq_bit*self.rvq_num*4*32/8/10**6
         opacity_mb = self._xyz.shape[0]*16/8/10**6
         hash_mb = self.recolor.params.shape[0]*16/8/10**6
-        mlp_mb = self.mlp_head.params.shape[0]*16/8/10**6
+        mlp_mb = sum([self.mlp_heads[i].params.shape[0]*16/8/10**6 for i in range(self.n_mlp_heads)])
         sum_mb = position_mb+scale_mb+rotation_mb+opacity_mb+hash_mb+mlp_mb
         
         mb_str = "Storage\nposition: "+str(position_mb)+"\nscale: "+str(scale_mb)+"\nrotation: "+str(rotation_mb)+"\nopacity: "+str(opacity_mb)+"\nhash: "+str(hash_mb)+"\nmlp: "+str(mlp_mb)+"\ntotal: "+str(sum_mb)+" MB"
@@ -592,7 +620,7 @@ class GaussianModel:
             rotation_mb += 2**self.rvq_bit*self.rvq_num*4*32/8/10**6
             opacity_mb, self.huf_opa, self.tab_opa = self.huffman_encode(self.quant_opa)
             hash_mb, self.huf_hash, self.tab_hash = self.huffman_encode(self.quant_hash)
-            mlp_mb = self.mlp_head.params.shape[0]*16/8/10**6
+            mlp_mb = sum([self.huffman_encode(self.mlp_heads[i].params)[0] for i in range(self.n_mlp_heads)])
             sum_mb = position_mb+scale_mb+rotation_mb+opacity_mb+hash_mb+mlp_mb
             
             mb_str = mb_str+"\n\nAfter PP\nposition: "+str(position_mb)+"\nscale: "+str(scale_mb)+"\nrotation: "+str(rotation_mb)+"\nopacity: "+str(opacity_mb)+"\nhash: "+str(hash_mb)+"\nmlp: "+str(mlp_mb)+"\ntotal: "+str(sum_mb)+" MB"
