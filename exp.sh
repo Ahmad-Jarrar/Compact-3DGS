@@ -163,35 +163,35 @@
 
 # Ensemble experiments
 
-# MLP = 1 Neurons = 64, Layers = 2
+# # MLP = 1 Neurons = 64, Layers = 2
 
-python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bicycle/ --eval --comp --store_npz -m output/bicycle_mlp_1_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 1
-python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bonsai/ --eval --comp --store_npz -m output/bonsai_mlp_1_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 1
+# python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bicycle/ --eval --comp --store_npz -m output/bicycle_mlp_1_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 1
+# python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bonsai/ --eval --comp --store_npz -m output/bonsai_mlp_1_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 1
 
-# Render Images
+# # Render Images
 
-python render.py -m output/bicycle_mlp_1_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 1
-python render.py -m output/bonsai_mlp_1_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 1
+# python render.py -m output/bicycle_mlp_1_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 1
+# python render.py -m output/bonsai_mlp_1_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 1
 
-# Test Metrics
+# # Test Metrics
 
-python metrics.py -m output/bicycle_mlp_1_n_64_l_2
-python metrics.py -m output/bonsai_mlp_1_n_64_l_2
+# python metrics.py -m output/bicycle_mlp_1_n_64_l_2
+# python metrics.py -m output/bonsai_mlp_1_n_64_l_2
 
-# MLP = 2 Neurons = 64, Layers = 2
+# # MLP = 2 Neurons = 64, Layers = 2
 
-python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bicycle/ --eval --comp --store_npz -m output/bicycle_mlp_2_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 2
-python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bonsai/ --eval --comp --store_npz -m output/bonsai_mlp_2_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 2
+# python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bicycle/ --eval --comp --store_npz -m output/bicycle_mlp_2_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 2
+# python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bonsai/ --eval --comp --store_npz -m output/bonsai_mlp_2_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 2
 
-# Render Images
+# # Render Images
 
-python render.py -m output/bicycle_mlp_2_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 2
-python render.py -m output/bonsai_mlp_2_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 2
+# python render.py -m output/bicycle_mlp_2_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 2
+# python render.py -m output/bonsai_mlp_2_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --n_mlp_heads 2
 
-# Test Metrics
+# # Test Metrics
 
-python metrics.py -m output/bicycle_mlp_2_n_64_l_2
-python metrics.py -m output/bonsai_mlp_2_n_64_l_2
+# python metrics.py -m output/bicycle_mlp_2_n_64_l_2
+# python metrics.py -m output/bonsai_mlp_2_n_64_l_2
 
 # MLP = 3 Neurons = 64, Layers = 2
 

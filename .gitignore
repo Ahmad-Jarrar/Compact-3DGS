@@ -183,4 +183,5 @@ pyrightconfig.json
 output/
 baseline/
 ablation/
+ensemble/
 log.*
