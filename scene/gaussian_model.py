@@ -627,7 +627,7 @@ class GaussianModel:
             rotation_mb += 2**self.rvq_bit*self.rvq_num*4*32/8/10**6
             opacity_mb, self.huf_opa, self.tab_opa = self.huffman_encode(self.quant_opa)
             hash_mb, self.huf_hash, self.tab_hash = self.huffman_encode(self.quant_hash)
-            mlp_mb = self.huffman_encode(self.mlp_heads.params)[0]
+            mlp_mb = self.huffman_encode(self.mlp_head.params)[0]
             # Multiple Heads
             # mlp_mb = sum([self.huffman_encode(self.mlp_heads[i].params)[0] for i in range(self.n_mlp_heads)])
             sum_mb = position_mb+scale_mb+rotation_mb+opacity_mb+hash_mb+mlp_mb
