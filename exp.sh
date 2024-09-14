@@ -302,15 +302,31 @@
 
 # MLP = 1 Neurons = 32, Layers = 2
 
-python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bicycle/ --eval --comp --store_npz -m output/bicycle_mlp_1_n_32_l_2 --mlp_neurons 32 --mlp_layers 2 --n_mlp_heads 1
-python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bonsai/ --eval --comp --store_npz -m output/bonsai_mlp_1_n_32_l_2 --mlp_neurons 32 --mlp_layers 2 --n_mlp_heads 1
+# python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bicycle/ --eval --comp --store_npz -m output/bicycle_mlp_1_n_32_l_2 --mlp_neurons 32 --mlp_layers 2 --n_mlp_heads 1
+# python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bonsai/ --eval --comp --store_npz -m output/bonsai_mlp_1_n_32_l_2 --mlp_neurons 32 --mlp_layers 2 --n_mlp_heads 1
+
+# # Render Images
+
+# python render.py -m output/bicycle_mlp_1_n_32_l_2 --mlp_neurons 32 --mlp_layers 2 --n_mlp_heads 1
+# python render.py -m output/bonsai_mlp_1_n_32_l_2 --mlp_neurons 32 --mlp_layers 2 --n_mlp_heads 1
+
+# # Test Metrics
+
+# python metrics.py -m output/bicycle_mlp_1_n_32_l_2
+# python metrics.py -m output/bonsai_mlp_1_n_32_l_2
+
+
+# MLP = 1 Neurons = 16, Layers = 2
+
+python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bicycle/ --eval --comp --store_npz -m output/bicycle_mlp_1_n_16_l_2 --mlp_neurons 16 --mlp_layers 2 --n_mlp_heads 1
+python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bonsai/ --eval --comp --store_npz -m output/bonsai_mlp_1_n_16_l_2 --mlp_neurons 16 --mlp_layers 2 --n_mlp_heads 1
 
 # Render Images
 
-python render.py -m output/bicycle_mlp_1_n_32_l_2 --mlp_neurons 32 --mlp_layers 2 --n_mlp_heads 1
-python render.py -m output/bonsai_mlp_1_n_32_l_2 --mlp_neurons 32 --mlp_layers 2 --n_mlp_heads 1
+python render.py -m output/bicycle_mlp_1_n_16_l_2 --mlp_neurons 16 --mlp_layers 2 --n_mlp_heads 1
+python render.py -m output/bonsai_mlp_1_n_16_l_2 --mlp_neurons 16 --mlp_layers 2 --n_mlp_heads 1
 
 # Test Metrics
 
-python metrics.py -m output/bicycle_mlp_1_n_32_l_2
-python metrics.py -m output/bonsai_mlp_1_n_32_l_2
+python metrics.py -m output/bicycle_mlp_1_n_16_l_2
+python metrics.py -m output/bonsai_mlp_1_n_16_l_2
