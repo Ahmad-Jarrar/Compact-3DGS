@@ -59,12 +59,11 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
         rotations = pc._rotation
         opacity = pc._opacity
         
-        dir_pp = (means3D - viewpoint_camera.camera_center.repeat(means3D.shape[0], 1))
-        dir_pp = dir_pp/dir_pp.norm(dim=1, keepdim=True)
-        
         if pc.use_trad_shs:
             shs = pc.get_features
         else:
+            dir_pp = (means3D - viewpoint_camera.camera_center.repeat(means3D.shape[0], 1))
+            dir_pp = dir_pp/dir_pp.norm(dim=1, keepdim=True)
             shs = pc.mlp_head(torch.cat([pc._feature, pc.direction_encoding(dir_pp)], dim=-1)).unsqueeze(1)
 
         # Multiple Heads
@@ -85,13 +84,13 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
             rotations = pc.get_rotation
             opacity = pc.get_opacity*mask
             
-        xyz = pc.contract_to_unisphere(means3D.clone().detach(), torch.tensor([-1.0, -1.0, -1.0, 1.0, 1.0, 1.0], device='cuda'))
-        dir_pp = (means3D - viewpoint_camera.camera_center.repeat(means3D.shape[0], 1))
-        dir_pp = dir_pp/dir_pp.norm(dim=1, keepdim=True)
 
         if pc.use_trad_shs:
             shs = pc.get_features
         else:
+            xyz = pc.contract_to_unisphere(means3D.clone().detach(), torch.tensor([-1.0, -1.0, -1.0, 1.0, 1.0, 1.0], device='cuda'))
+            dir_pp = (means3D - viewpoint_camera.camera_center.repeat(means3D.shape[0], 1))
+            dir_pp = dir_pp/dir_pp.norm(dim=1, keepdim=True)
             shs = pc.mlp_head(torch.cat([pc.recolor(xyz), pc.direction_encoding(dir_pp)], dim=-1)).unsqueeze(1)
 
         # Multiple Heads

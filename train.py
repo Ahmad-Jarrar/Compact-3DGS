@@ -135,9 +135,10 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
             if iteration < opt.iterations:
                 gaussians.optimizer.step()
                 gaussians.optimizer.zero_grad(set_to_none = True)
-                gaussians.optimizer_net.step()
-                gaussians.optimizer_net.zero_grad(set_to_none = True)
-                gaussians.scheduler_net.step()
+                if not gaussians.use_trad_shs:
+                    gaussians.optimizer_net.step()
+                    gaussians.optimizer_net.zero_grad(set_to_none = True)
+                    gaussians.scheduler_net.step()
             if (iteration in checkpoint_iterations):
                 print("\n[ITER {}] Saving Checkpoint".format(iteration))
                 torch.save((gaussians.capture(), iteration), scene.model_path + "/chkpnt" + str(iteration) + ".pth")
