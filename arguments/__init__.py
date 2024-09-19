@@ -57,9 +57,11 @@ class ModelParams(ParamGroup):
         self.max_hashmap = 19
         self.rvq_size = 64
         self.rvq_num = 6
+        self.use_trad_shs = False
+        self.post_training_mlp = False
         self.mlp_neurons = 64
         self.mlp_layers = 2
-        self.n_mlp_heads = 1
+        # self.n_mlp_heads = 1
         super().__init__(parser, "Loading Parameters", sentinel)
 
     def extract(self, args):
