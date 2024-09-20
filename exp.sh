@@ -334,15 +334,15 @@
 
 # No MLP results
 
-python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bicycle/ --eval -m output/bicycle_no_mlp_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --use_trad_shs --post_training_mlp
-python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bonsai/ --eval -m output/bonsai_no_mlp_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --use_trad_shs --post_training_mlp
+python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bicycle/ --eval -m output/bicycle_no_mlp_n_64_l_2_sh_3 --mlp_neurons 64 --mlp_layers 2 --sh_degree 3 --use_trad_shs --post_training_mlp
+python train.py -s /scratch/cvlab/datasets/datasets_ahmad/mipNerf360/bonsai/ --eval -m output/bonsai_no_mlp_n_64_l_2_sh_3 --mlp_neurons 64 --mlp_layers 2 --sh_degree 3 --use_trad_shs --post_training_mlp
 
 # Render Images
 
-python render.py -m output/bicycle_no_mlp_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --use_trad_shs --post_training_mlp
-python render.py -m output/bonsai_no_mlp_n_64_l_2 --mlp_neurons 64 --mlp_layers 2 --use_trad_shs --post_training_mlp
+python render.py -m output/bicycle_no_mlp_n_64_l_2_sh_3 --mlp_neurons 64 --mlp_layers 2 --sh_degree 3 --use_trad_shs --post_training_mlp
+python render.py -m output/bonsai_no_mlp_n_64_l_2_sh_3 --mlp_neurons 64 --mlp_layers 2 --sh_degree 3 --use_trad_shs --post_training_mlp
 
 # Test Metrics
 
-python metrics.py -m output/bicycle_no_mlp_n_64_l_2
-python metrics.py -m output/bonsai_no_mlp_n_64_l_2
+python metrics.py -m output/bicycle_no_mlp_n_64_l_2_sh_3
+python metrics.py -m output/bonsai_no_mlp_n_64_l_2_sh_3
