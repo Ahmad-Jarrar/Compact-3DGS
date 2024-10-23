@@ -610,7 +610,7 @@ class GaussianModel:
         self.denom = torch.zeros((self.get_xyz.shape[0], 1), device="cuda")
         self.max_radii2D = torch.zeros((self.get_xyz.shape[0]), device="cuda")
 
-    def densification_postfix(self, new_xyz, new_features_dc, new_features_rest, new_opacities, new_scaling, new_rotation, new_mask):
+    def densification_postfix2(self, new_xyz, new_features_dc, new_features_rest, new_opacities, new_scaling, new_rotation, new_mask):
         d = {"xyz": new_xyz,
         "f_dc": new_features_dc,
         "f_rest": new_features_rest,
@@ -655,11 +655,11 @@ class GaussianModel:
 
         new_opacity = self._opacity[selected_pts_mask].repeat(N,1)
         new_mask = self._mask[selected_pts_mask].repeat(N,1)
-        print("New Rotation : ", new_rotation.shape[0])
-        print("New Mask : ", new_mask.shape[0])
+        print("New Rotation : ", new_rotation.shape)
+        print("New Mask : ", new_mask.shape)
         if self.use_trad_shs:
             # For traditional SH training
-            self.densification_postfix(new_xyz, new_features_dc, new_features_rest, new_opacity, new_scaling, new_rotation, new_mask)
+            self.densification_postfix2(new_xyz, new_features_dc, new_features_rest, new_opacity, new_scaling, new_rotation, new_mask)
         else:
             self.densification_postfix(new_xyz, new_opacity, new_scaling, new_rotation, new_mask)
 
@@ -681,13 +681,15 @@ class GaussianModel:
         new_scaling = self._scaling[selected_pts_mask]
         new_rotation = self._rotation[selected_pts_mask]
         new_mask = self._mask[selected_pts_mask]
-        print("New Rotation : ", new_rotation.shape[0])
-        print("New Mask : ", new_mask.shape[0])
+        print("New Rotation : ", new_rotation.shape)
+        print("New Mask : ", new_mask.shape)
 
         if self.use_trad_shs:
             # For traditional SH training
-            self.densification_postfix(new_xyz, new_features_dc, new_features_rest, new_opacities, new_scaling, new_rotation, new_mask)
+            self.densification_postfix2(new_xyz, new_features_dc, new_features_rest, new_opacities, new_scaling, new_rotation, new_mask)
         else:
+            print("New Rotation in call: ", new_rotation.shape)
+            print("New Mask in call: ", new_mask.shape)
             self.densification_postfix(new_xyz, new_opacities, new_scaling, new_rotation, new_mask)
 
     def densify_and_prune(self, max_grad, min_opacity, extent, max_screen_size):
