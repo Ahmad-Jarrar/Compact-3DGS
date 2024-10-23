@@ -655,7 +655,8 @@ class GaussianModel:
 
         new_opacity = self._opacity[selected_pts_mask].repeat(N,1)
         new_mask = self._mask[selected_pts_mask].repeat(N,1)
-
+        print("New Rotation : ", new_rotation.shape[0])
+        print("New Mask : ", new_mask.shape[0])
         if self.use_trad_shs:
             # For traditional SH training
             self.densification_postfix(new_xyz, new_features_dc, new_features_rest, new_opacity, new_scaling, new_rotation, new_mask)
@@ -680,6 +681,8 @@ class GaussianModel:
         new_scaling = self._scaling[selected_pts_mask]
         new_rotation = self._rotation[selected_pts_mask]
         new_mask = self._mask[selected_pts_mask]
+        print("New Rotation : ", new_rotation.shape[0])
+        print("New Mask : ", new_mask.shape[0])
 
         if self.use_trad_shs:
             # For traditional SH training
